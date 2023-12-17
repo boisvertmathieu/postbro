@@ -36,15 +36,34 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ],
             "customWebpackConfig": {
               "path": "./angular.webpack.js",
               "replaceDuplicatePlugins": true
             }
           },
           "configurations": {
+            "local": {
+              "optimization": false,
+              "outputHashing": "none",
+              "sourceMap": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
+            },
             "dev": {
               "optimization": false,
               "outputHashing": "none",
@@ -76,38 +95,6 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
-            },
-            "web": {
-              "optimization": false,
-              "outputHashing": "none",
-              "sourceMap": true,
-              "namedChunks": false,
-              "aot": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.web.ts"
-                }
-              ]
-            },
-            "web-production": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.web.prod.ts"
-                }
-              ]
             }
           }
         },
@@ -117,17 +104,14 @@
             "browserTarget": "angular-electron:build"
           },
           "configurations": {
+            "local": {
+              "browserTarget": "angular-electron:build:local"
+            },
             "dev": {
               "browserTarget": "angular-electron:build:dev"
             },
             "production": {
               "browserTarget": "angular-electron:build:production"
-            },
-            "web": {
-              "browserTarget": "angular-electron:build:web"
-            },
-            "web-production": {
-              "browserTarget": "angular-electron:build:web-production"
             }
           }
         },

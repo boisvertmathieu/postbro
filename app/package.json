@@ -1,13 +1,14 @@
 {
   "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "description": "Angular Electron app",
   "author": {
-    "name": "Maxime GRIS",
-    "email": "maxime.gris@gmail.com"
+    "name": "Mathieu Boisvert",
+    "email": "boisvert.my@gmail.com"
   },
   "version": "13.0.0",
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "bootstrap": "^5.3.2"
   }
 }
