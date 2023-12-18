@@ -12,11 +12,9 @@ module.exports = (config, options) => {
       if (fileReplacement.replace !== 'src/environments/environment.ts') {
         continue;
       }
-
       let fileReplacementParts = fileReplacement['with'].split('.');
-      if (fileReplacementParts.length > 1 && ['web'].indexOf(fileReplacementParts[1]) >= 0
-        || ['local'].indexOf(fileReplacementParts[1]) >= 0 || ['dev'].indexOf(fileReplacementParts[1]) >= 0) {
-        config.target = 'web';
+      if (['local', 'dev', 'prod', 'test', 'electron-renderer'].indexOf(fileReplacementParts[1]) < 0) {
+        config.target = fileReplacementParts[1];
       }
       break;
     }
