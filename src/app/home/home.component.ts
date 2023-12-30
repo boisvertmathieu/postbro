@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {HttpService, isHttpResponse, Request} from '../http/http.service'
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-home',
@@ -17,8 +17,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     private fb: FormBuilder,
-    private http: HttpClient
-  ) {}
+    private httpService: HttpService
+  ) {
+  }
 
   ngOnInit(): void {
     console.log('HomeComponent INIT');
@@ -64,60 +65,42 @@ export class HomeComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('on submit');
     const formValue = this.myForm.value;
 
-    let headers = new HttpHeaders();
-    formValue.headers.forEach((header: any) => {
-      headers = headers.set(header.key, header.value);
-    });
-
-    let params = new HttpParams();
-    formValue.queryParams.forEach(
-      (param: { key: string; value: string | number | boolean }) => {
-        params = params.set(param.key, param.value);
-      }
-    );
-
-    let url = formValue.url;
-    let body = '{}';
-    let httpMethod = formValue.httpMethod;
-    let request$: Observable<any>;
-    const options = {
-      headers,
-      params,
-      observe: 'response' as const,
+    const request: Request = {
+      url: formValue.url,
+      method: formValue.httpMethod,
+      headers: formValue.headers.reduce(
+        (acc: { [key: string]: string }, header: { [key: string]: string }) => {
+          acc[header.key] = header.value;
+          return acc;
+        }, {}),
+      queryParams: formValue.queryParams.reduce(
+        (acc: { [key: string]: string }, param: { [key: string]: string }) => {
+          acc[param.key] = param.value;
+          return acc;
+        }, {}),
+      // TODO : Ajouter la possibilité d'avoir un body dans la requête
+      body: formValue.httpMethod === 'GET' || formValue.httpMethod === 'DELETE' ? null : '{}',
     };
 
-    switch (httpMethod) {
-      case 'GET':
-        request$ = this.http.get<any>(url, options);
-        break;
-      case 'DELETE':
-        request$ = this.http.delete<any>(url, options);
-        break;
-      case 'POST':
-        request$ = this.http.post<any>(url, body, options);
-        break;
-      case 'PUT':
-        request$ = this.http.put<any>(url, body, options);
-        break;
-      case 'PATCH':
-        request$ = this.http.patch<any>(url, body, options);
-        break;
-      default:
-        return;
-    }
-
-    return request$.subscribe({
-      next: (response) => {
-        this.responseData = `Statut: ${
-          response.status
-        }\nDonnées: ${JSON.stringify(response.body, null, 2)}`;
-      },
-      error: (error) => {
-        this.responseData = `Erreur: ${error.status}\nMessage: ${error.message}`;
-      },
-    });
+    this.httpService
+      .sendRequest(request)
+      .subscribe({
+        next: (response) => {
+          if (isHttpResponse(response)) {
+            this.responseData = `Status: ${response.status}\nData: ${JSON.stringify(response.body, null, 2)}`;
+          } else {
+            this.responseData = `Response is not of type Response`
+          }
+        },
+        error: (error: HttpErrorResponse | Error) => {
+          if (error instanceof HttpErrorResponse) {
+            this.responseData = `Error: ${error.status}\nMessage: ${error.message}`;
+          } else {
+            this.responseData = `Error: ${error.message}`;
+          }
+        }
+      });
   }
 }
