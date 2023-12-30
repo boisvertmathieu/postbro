@@ -7,6 +7,7 @@ CORS(app)
 @app.route('/get', methods=['GET'])
 def get_method():
     # Logique pour la méthode GET
+    print(dict(request.headers))
     return jsonify({"message": "Réponse de GET"}), 200
 
 @app.route('/post', methods=['POST'])
